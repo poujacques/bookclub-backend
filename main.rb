@@ -1,4 +1,5 @@
 require 'sinatra'
+require 'sinatra/cross_origin'
 require 'sinatra/namespace'
 require 'net/http'
 
@@ -6,6 +7,14 @@ require 'net/http'
 port = ENV['DEFAULT_PORT']
 if !port
   port = 8080
+end
+
+configure do
+  enable :cross_origin
+end  
+
+before do
+  response.headers['Access-Control-Allow-Origin'] = '*'
 end
 
 set :port, port
