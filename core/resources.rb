@@ -1,5 +1,3 @@
-# Resources will contain most of the core logic
-
 def get_db_string()
   ENV['BOOKCLUB_MDB_STRING']
 end
