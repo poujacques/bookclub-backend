@@ -1,7 +1,7 @@
 # Auth will take care of authentication
 
-require 'bcrypt' # https://github.com/codahale/bcrypt-ruby 
 require './core/repositories.rb'
+require 'bcrypt' # https://github.com/codahale/bcrypt-ruby 
 require 'date'
 
 def verify_input(username, pw)
