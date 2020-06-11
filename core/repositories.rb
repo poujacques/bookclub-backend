@@ -1,10 +1,10 @@
 # Repositories is for any database-related actions
 
-require 'mongo'
-require 'securerandom'
-require 'date'
+require "mongo"
+require "securerandom"
+require "date"
 
-require './core/resources.rb'
+require "./core/resources.rb"
 
 Mongo::Logger.logger.level = Logger::FATAL
 
@@ -23,14 +23,14 @@ def delete_token(token)
 end
 
 def generate_token(user_id)
-  access_token = SecureRandom.uuid.gsub('-', '')
-  refresh_token = SecureRandom.uuid.gsub('-', '')
+  access_token = SecureRandom.uuid.gsub("-", "")
+  refresh_token = SecureRandom.uuid.gsub("-", "")
   expiry = Time.now + 60 * 60 * 24 * 14
   token = {
     user_id: user_id,
     access_token: access_token,
     # refresh_token: refresh_token, # Temporarily deactivated until we build logic for this
-    expiry: expiry
+    expiry: expiry,
   }
   client = get_db
   client[:sessions].insert_one(token)
@@ -46,8 +46,8 @@ def get_token(user_id, access_token)
 end
 
 def create_user(userdata)
-  user_id = SecureRandom.uuid.gsub('-', '')
-  userdata['id'] = user_id
+  user_id = SecureRandom.uuid.gsub("-", "")
+  userdata["id"] = user_id
   client = get_db
   result = client[:users].insert_one(userdata)
   user_id if result.n > 0
