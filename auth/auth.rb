@@ -3,20 +3,21 @@
 require './core/repositories.rb'
 require 'bcrypt' # https://github.com/codahale/bcrypt-ruby
 require 'date'
+# require 'sinatra'
 
 def verify_input(username, pw)
   error = nil
   if username.nil? || username.empty?
-    error = 'Missing `username` in request'
+    halt 400, 'Missing `username` in request'
   elsif pw.nil? || pw.empty?
-    error = 'Missing `password` in request'
+    halt 400, 'Missing `password` in request'
   end
   error
 end
 
 def verify_registration_input(username, pw, email)
   error = verify_input(username, pw)
-  error = 'Missing `email` in request' if email.nil? || email.empty?
+  halt 400, 'Missing `email` in request' if email.nil? || email.empty?
   error
 end
 
@@ -25,7 +26,7 @@ def register_user(username, pw, email)
   return error if error
 
   user = get_user_from_username(username)
-  return 'User already exists' if user
+  halt 409, 'User already exists' if user
 
   hashed_password = BCrypt::Password.create(pw)
   userdata = {
@@ -44,37 +45,33 @@ def verify_user(username, pw)
 
   user = get_user_from_username(username)
   if !user
-    'User does not exist'
+    halt 404, 'User does not exist'
   else
     hashed_password = user['hashed_password']
 
-    token = 'Incorrect password'
-    if (BCrypt::Password.new(hashed_password) == pw)
-      token = generate_token(user['id']).to_json
+    if (BCrypt::Password.new(hashed_password) != pw)
+      halt 401, 'Incorrect password'
     end
+    token = generate_token(user['id']).to_json
     token
   end
 end
 
 def deactivate_token(access_token)
   if access_token.nil? || access_token.empty?
-    return 'Missing `access_token` in Logout Request'
+    halt 400, 'Missing `access_token` in Logout Request'
   end
   modified = delete_token(access_token)
-  response = 'Could not delete token: No such token found in database'
-  response = 'Successfully deleted token' if modified > 0
-  response
+  if modified == 0
+    halt 404, 'Could not delete token: No such token found in database'
+  end
+  'Successfully deleted token'
 end
 
 def verify_token(user_id, access_token)
-  error = 'Invalid token/user_id combination'
   token = get_token(user_id, access_token)
-  if token
-    if Time.now < token['expiry']
-      error = nil
-    else
-      error = 'Token expired'
-    end
-  end
-  error
+  halt 401, 'Invalid token/user_id combination' if !token
+
+  halt 401, 'Token expired' if Time.now >= token['expiry']
+  nil
 end

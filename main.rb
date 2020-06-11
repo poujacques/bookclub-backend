@@ -64,12 +64,11 @@ namespace '/api/v1' do
   get '/:user_id/protected_endpoint' do |user_id|
     access_token = request.env['HTTP_AUTHORIZATION']
     if !access_token
-      return 'Missing Authorization header in request to protected endpoint'
+      halt 400, 'Missing Authorization header in request to protected endpoint'
     end
 
     access_token = access_token.sub('Bearer ', '')
-    error = verify_token(user_id, access_token)
-    return error if error
+    verify_token(user_id, access_token)
     'Successfully accessed data using correct credentials'
   end
 end
