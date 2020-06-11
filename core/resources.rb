@@ -4,8 +4,6 @@ end
 
 def get_port()
   port = ENV['DEFAULT_PORT']
-  if !port 
-    port = 8080
-  end
+  port = 8080 if !port
   port
 end
