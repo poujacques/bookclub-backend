@@ -3,10 +3,10 @@
 require "net/http"
 
 module Volumes
-  @@base_uri = "https://www.googleapis.com/books/v1"
+  BASE_URI = "https://www.googleapis.com/books/v1"
 
   def get_volumes_result(uri_path, query = nil)
-    uri = URI(@@base_uri + uri_path)
+    uri = URI(BASE_URI + uri_path)
     if !query.nil?
       params = { q: query }
       uri.query = URI.encode_www_form(params)
