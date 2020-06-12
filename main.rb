@@ -1,9 +1,7 @@
 # The driver. Defines the webserver and its endpoints.
 
 require "./auth/auth.rb"
-require "./core/resources.rb"
 require "./core/volumes.rb"
-require "./core/errors.rb"
 
 require "json"
 require "sinatra"
@@ -11,6 +9,8 @@ require "sinatra/cross_origin"
 require "sinatra/namespace"
 
 class Bookclub < Sinatra::Base
+  include Auth, Volumes
+
   # CORS
   configure do
     enable :cross_origin
