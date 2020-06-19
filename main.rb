@@ -1,6 +1,7 @@
 # The driver. Defines the webserver and its endpoints.
 
 require "./auth/auth.rb"
+require "./core/shelves.rb"
 require "./core/volumes.rb"
 
 require "json"
@@ -8,8 +9,8 @@ require "sinatra"
 require "sinatra/cross_origin"
 require "sinatra/namespace"
 
-class Bookclub < Sinatra::Base
-  include Auth, Volumes
+class Bookclub < Sinatra::Base # to_json should be done at the router level right?
+  include Auth, Shelves, Volumes
 
   # CORS
   configure do
@@ -22,7 +23,7 @@ class Bookclub < Sinatra::Base
   end
 
   options "*" do
-    response.headers["Allow"] = "GET, PUT, POST, DELETE, OPTIONS"
+    response.headers["Allow"] = "GET, PATCH, POST, DELETE, OPTIONS"
     response.headers["Access-Control-Allow-Headers"] = "Authorization, Content-Type, Accept, X-User-Email, X-Auth-Token"
     response.headers["Access-Control-Allow-Origin"] = "*"
     200
@@ -77,8 +78,9 @@ class Bookclub < Sinatra::Base
     end
 
     get "/:user_id/protected_endpoint" do |user_id|
+      # Placeholder for protected endpoints
       access_token = request.env["HTTP_AUTHORIZATION"]
-      if !access_token
+      if access_token.nil?
         halt 400, "Missing Authorization header in request to protected endpoint"
       end
 
@@ -89,6 +91,35 @@ class Bookclub < Sinatra::Base
         halt e.status_code, e.msg
       end
       "Successfully accessed data using correct credentials"
+    end
+
+    get "/:user_id/shelves" do |user_id| # not protected
+      get_user_shelf(user_id)
+    end
+
+    patch "/:user_id/shelves/exclusive" do |user_id| # protected
+      # access_token = request.env["HTTP_AUTHORIZATION"]
+      # if access_token.nil?
+      #   halt 400, "Missing Authorization header in request to protected endpoint"
+      # end
+
+      # access_token = access_token.sub("Bearer ", "")
+      # begin
+      #   verify_token(user_id, access_token)
+      # rescue AuthError => e
+      #   halt e.status_code, e.msg
+      # end
+
+      data = JSON.parse(request.body.read)
+      operation = data["op"]
+      volume_id = data["volume_id"]
+      to_shelf = data["to_shelf"]
+      set_completed = data["set_completed"]
+      begin
+        modify_exclusive_shelves(user_id, operation, volume_id, to_shelf, set_completed)
+      rescue ShelfOpError => e
+        halt e.status_code, e.msg
+      end
     end
   end
 end

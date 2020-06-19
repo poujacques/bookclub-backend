@@ -1,30 +1,27 @@
 # Auth will take care of authentication
 
 require "./core/errors.rb"
-require "./core/repositories.rb"
+require "./core/repository.rb"
 
 require "bcrypt"
 require "date"
 
 module Auth
-  include BookclubErrors, Repositories
+  include BookclubErrors, Repository
 
   def verify_input(username, pw)
-    error = nil
     if username.nil? || username.empty?
       raise AuthError.new(400, "Missing `username` in request")
     elsif pw.nil? || pw.empty?
       raise AuthError.new(400, "Missing `password` in request")
     end
-    error
   end
 
   def verify_registration_input(username, pw, email)
-    error = verify_input(username, pw)
+    verify_input(username, pw)
     if email.nil? || email.empty?
       raise AuthError.new(400, "Missing `email` in request")
     end
-    error
   end
 
   def register_user(username, pw, email)
@@ -52,7 +49,7 @@ module Auth
     return error if error
 
     user = get_user_from_username(username)
-    if !user
+    if user.nil?
       raise AuthError.new(404, "User does not exist")
     else
       hashed_password = user["hashed_password"]
@@ -61,6 +58,18 @@ module Auth
       end
       generate_token(user["id"]).to_json
     end
+  end
+
+  def generate_token(user_id)
+    access_token = SecureRandom.uuid.gsub("-", "")
+    refresh_token = SecureRandom.uuid.gsub("-", "")
+    expiry = Time.now + 60 * 60 * 24 * 14
+    token = {
+      user_id: user_id,
+      access_token: access_token,
+      expiry: expiry,
+    }
+    insert_token(token)
   end
 
   def deactivate_token(access_token)
@@ -76,7 +85,7 @@ module Auth
 
   def verify_token(user_id, access_token)
     token = get_token(user_id, access_token)
-    if !token
+    if token.nil?
       raise AuthError.new(401, "Invalid token/user_id combination")
     end
 
