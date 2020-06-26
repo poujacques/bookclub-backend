@@ -33,6 +33,7 @@ module Shelves #This should be a Class
         shelf_response[x["shelf"]] = []
         shelf_response[x["shelf"] + "_count"] = 0
       end
+      # BUG: This does not check if a volume is an actual volume. If I add "123" to a shelf then i am screwed.
       shelf_response[x["shelf"]].append(JSON.parse(get_volumes_result("/volumes/" + x["volume_id"])))
       shelf_response[x["shelf"] + "_count"] += 1
     end
