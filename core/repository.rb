@@ -71,7 +71,7 @@ module Repository
 
   def remove_volume_from_exclusive_shelf(user_id, volume_id)
     client = get_db
-    shelf = client[:shelves].update_one({ "user_id": user_id, "type": "exclusive" }, { "$pull": { "volumes": { "id": volume_id } } })
+    shelf = client[:shelves].update_one({ "user_id": user_id, "type": "exclusive" }, { "$pull": { "volumes": { "volume_id": volume_id } } })
     shelf
   end
 

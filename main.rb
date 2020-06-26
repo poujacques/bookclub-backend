@@ -98,17 +98,17 @@ class Bookclub < Sinatra::Base # to_json should be done at the router level righ
     end
 
     patch "/:user_id/shelves/exclusive" do |user_id| # protected
-      # access_token = request.env["HTTP_AUTHORIZATION"]
-      # if access_token.nil?
-      #   halt 400, "Missing Authorization header in request to protected endpoint"
-      # end
+      access_token = request.env["HTTP_AUTHORIZATION"]
+      if access_token.nil?
+        halt 400, "Missing Authorization header in request to protected endpoint"
+      end
 
-      # access_token = access_token.sub("Bearer ", "")
-      # begin
-      #   verify_token(user_id, access_token)
-      # rescue AuthError => e
-      #   halt e.status_code, e.msg
-      # end
+      access_token = access_token.sub("Bearer ", "")
+      begin
+        verify_token(user_id, access_token)
+      rescue AuthError => e
+        halt e.status_code, e.msg
+      end
 
       data = JSON.parse(request.body.read)
       operation = data["op"]
