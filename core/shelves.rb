@@ -29,12 +29,15 @@ module Shelves #This should be a Class
     shelf_response = {}
 
     shelf["volumes"].each do |x|
-      if !shelf_response.key?(x["shelf"])
-        shelf_response[x["shelf"]] = []
-        shelf_response[x["shelf"] + "_count"] = 0
+      volume_api_result = JSON.parse(get_volumes_result("/volumes/" + x["volume_id"]))
+      if !volume_api_result.key?("error")
+        if !shelf_response.key?(x["shelf"])
+          shelf_response[x["shelf"]] = []
+          shelf_response[x["shelf"] + "_count"] = 0
+        end
+        shelf_response[x["shelf"]].append(volume_api_result)
+        shelf_response[x["shelf"] + "_count"] += 1
       end
-      shelf_response[x["shelf"]].append(JSON.parse(get_volumes_result("/volumes/" + x["volume_id"])))
-      shelf_response[x["shelf"] + "_count"] += 1
     end
 
     shelf_response.to_json
