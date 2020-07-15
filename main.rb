@@ -1,6 +1,7 @@
 # The driver. Defines the webserver and its endpoints.
 
 require "./auth/auth.rb"
+require "./core/profiles.rb"
 require "./core/shelves.rb"
 require "./core/volumes.rb"
 
@@ -10,7 +11,7 @@ require "sinatra/cross_origin"
 require "sinatra/namespace"
 
 class Bookclub < Sinatra::Base # to_json should be done at the router level right?
-  include Auth, Shelves, Volumes
+  include Auth, Profiles, Shelves, Volumes
 
   # CORS
   configure do
@@ -77,6 +78,14 @@ class Bookclub < Sinatra::Base # to_json should be done at the router level righ
       "Successfully deleted token"
     end
 
+    get "/user/:username" do |username|
+      begin
+        get_user(username)
+      rescue AuthError => e
+        halt e.status_code, e.msg
+      end
+    end
+
     get "/:user_id/protected_endpoint" do |user_id|
       # Placeholder for protected endpoints
       access_token = request.env["HTTP_AUTHORIZATION"]
@@ -94,7 +103,11 @@ class Bookclub < Sinatra::Base # to_json should be done at the router level righ
     end
 
     get "/:user_id/shelves" do |user_id| # not protected
-      get_user_shelf(user_id)
+      begin
+        get_user_shelf(user_id)
+      rescue AuthError => e
+        halt e.status_code, e.msg
+      end
     end
 
     patch "/:user_id/shelves/exclusive" do |user_id| # protected
@@ -120,6 +133,39 @@ class Bookclub < Sinatra::Base # to_json should be done at the router level righ
       rescue ShelfOpError => e
         halt e.status_code, e.msg
       end
+    end
+
+    get "/:user_id/profile" do |user_id| # not protected
+      begin
+        get_profile(user_id)
+      rescue ProfileError => e
+        halt e.status_code, e.msg
+      end
+    end
+
+    patch "/:user_id/profile" do |user_id| # protected
+      access_token = request.env["HTTP_AUTHORIZATION"]
+      if access_token.nil?
+        halt 400, "Missing Authorization header in request to protected endpoint"
+      end
+
+      access_token = access_token.sub("Bearer ", "")
+      begin
+        verify_token(user_id, access_token)
+      rescue ProfileError => e
+        halt e.status_code, e.msg
+      end
+
+      data = JSON.parse(request.body.read)
+      profile_fields = get_profile_fields()
+      profile_updates = {}
+
+      profile_fields.each do |field|
+        if !data[field].nil?
+          profile_updates[field] = data[field]
+        end
+      end
+      update_profile_fields(user_id, profile_updates)
     end
   end
 end

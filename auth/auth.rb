@@ -41,7 +41,20 @@ module Auth
       source: "bookclub",
     }
     user_id = create_user(userdata)
+    generate_profile(user_id)
     generate_token(user_id).to_json
+  end
+
+  def get_user(username)
+    user = get_user_from_username(username)
+    if user.nil?
+      raise AuthError.new(404, "User does not exist")
+    end
+    user_response = {
+      username: user["username"],
+      user_id: user["user_id"],
+    }
+    user_response.to_json
   end
 
   def verify_user(username, pw)
@@ -56,7 +69,7 @@ module Auth
       if (BCrypt::Password.new(hashed_password) != pw)
         raise AuthError.new(401, "Incorrect password")
       end
-      generate_token(user["id"]).to_json
+      generate_token(user["user_id"]).to_json
     end
   end
 

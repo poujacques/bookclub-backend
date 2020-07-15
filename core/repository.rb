@@ -46,7 +46,7 @@ module Repository
 
   def create_user(userdata)
     user_id = SecureRandom.uuid.gsub("-", "")
-    userdata["id"] = user_id
+    userdata["user_id"] = user_id
     client = get_db
     result = client[:users].insert_one(userdata)
     client.close
@@ -102,5 +102,33 @@ module Repository
     )
     client.close
     shelf
+  end
+
+  def get_user_profile(user_id)
+    client = get_db
+    profile = client[:profiles].find("user_id": user_id).first
+    client.close
+    profile
+  end
+
+  def insert_profile(new_profile)
+    profile_id = SecureRandom.uuid.gsub("-", "")
+    new_profile["profile_id"] = profile_id
+    client = get_db
+    profile = client[:profiles].insert_one(new_profile)
+    client.close
+    profile
+  end
+
+  def update_profile(user_id, profile_updates)
+    client = get_db
+    profile = client[:profiles].update_one(
+      {
+        "user_id": user_id,
+      },
+      { "$set": profile_updates },
+    )
+    client.close
+    profile
   end
 end

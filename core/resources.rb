@@ -8,6 +8,10 @@ module Resources
   def get_default_shelfnames()
     ["currently_reading", "previously_read", "want_to_read"]
   end
+
+  def get_profile_fields()
+    ["bio", "profile_picture", "favourite_book"]
+  end
 end
 
 # TODO: Move UUID generator here (securerandom)

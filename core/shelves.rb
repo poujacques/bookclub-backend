@@ -23,7 +23,7 @@ module Shelves #This should be a Class
   def get_user_shelf(user_id, query = nil)
     shelf = get_exclusive_shelf(user_id)
     if shelf.nil?
-      shelf = initialize_shelf(user_id)
+      raise AuthError.new(404, "User does not exist or no shelf data exists")
     end
 
     shelf_response = {}
