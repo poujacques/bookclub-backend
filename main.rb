@@ -44,6 +44,10 @@ class Bookclub < Sinatra::Base # to_json should be done at the router level righ
       get_volumes_result("/volumes/" + volume_id)
     end
 
+    get "/nyt-top-ten" do
+      get_nyt_top_10()
+    end
+
     post "/register" do
       data = JSON.parse(request.body.read)
       username = data["username"]

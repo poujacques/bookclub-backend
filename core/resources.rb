@@ -5,6 +5,10 @@ module Resources
     ENV["BOOKCLUB_MDB_STRING"]
   end
 
+  def get_nyt_api_token()
+    ENV["NYT_API_TOKEN"]
+  end
+
   def get_default_shelfnames()
     ["currently_reading", "previously_read", "want_to_read"]
   end
