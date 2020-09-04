@@ -19,19 +19,20 @@ module Volumes # There should be a class for this
   end
 
   def get_nyt_top_10()
-    # Input should be current date or something
-    # or maybe just do it here idk why I would make the frontend work harder than it has to
-    # oh I know, its so we can be able to get the data from any time duh
+    # Will it always be 10? Why did I hardcode this? Silly mistakes ¯\_(ツ)_/¯
     top_ten = []
 
     nyt_uri = URI(NYT_URI)
     params = { 'api-key': NYT_API_TOKEN }
     nyt_uri.query = URI.encode_www_form(params)
     nyt_response = JSON.parse(Net::HTTP.get(nyt_uri))
+    books_list = nyt_response["results"]["books"]
 
     for i in 0..9
-      isbn = nyt_response["results"]["books"][i]["primary_isbn13"]
-      top_ten.append(JSON.parse(get_volumes_result("/volumes", "isbn:" + isbn)))
+      response_object = { "nyt": books_list[i], "rank": books_list[i]["rank"] }
+      isbn = books_list[i]["primary_isbn13"]
+      response_object["google_books"] = JSON.parse(get_volumes_result("/volumes", "isbn:" + isbn))
+      top_ten.append(response_object)
     end
     top_ten.to_json
   end
