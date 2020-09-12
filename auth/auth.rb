@@ -42,7 +42,9 @@ module Auth
     }
     user_id = create_user(userdata)
     generate_profile(user_id)
-    generate_token(user_id).to_json
+    response = generate_token(user_id)
+    response["username"] = username
+    response.to_json
   end
 
   def get_user(username)
@@ -69,7 +71,9 @@ module Auth
       if (BCrypt::Password.new(hashed_password) != pw)
         raise AuthError.new(401, "Incorrect password")
       end
-      generate_token(user["user_id"]).to_json
+      response = generate_token(user["user_id"])
+      response["username"] = username
+      response.to_json
     end
   end
 
