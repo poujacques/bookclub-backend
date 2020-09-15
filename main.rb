@@ -20,11 +20,13 @@ class Bookclub < Sinatra::Base # to_json should be done at the router level righ
   end
 
   before do
+    response.headers["Access-Control-Allow-Methods"] = "GET, PATCH, POST, DELETE, OPTIONS"
+    response.headers["Access-Control-Allow-Headers"] = "Authorization, Content-Type, Accept, X-User-Email, X-Auth-Token"
     response.headers["Access-Control-Allow-Origin"] = "*"
   end
 
   options "*" do
-    response.headers["Allow"] = "GET, PATCH, POST, DELETE, OPTIONS"
+    response.headers["Access-Control-Allow-Methods"] = "GET, PATCH, POST, DELETE, OPTIONS"
     response.headers["Access-Control-Allow-Headers"] = "Authorization, Content-Type, Accept, X-User-Email, X-Auth-Token"
     response.headers["Access-Control-Allow-Origin"] = "*"
     200
