@@ -46,7 +46,7 @@ module Repository
 
   def create_user(userdata)
     user_id = SecureRandom.uuid.gsub("-", "")
-    userdata["user_id"] = user_id
+    userdata[:user_id] = user_id
     client = get_db
     result = client[:users].insert_one(userdata)
     client.close
@@ -62,7 +62,7 @@ module Repository
 
   def insert_shelf(new_shelf)
     shelf_id = SecureRandom.uuid.gsub("-", "")
-    new_shelf["shelf_id"] = shelf_id
+    new_shelf[:shelf_id] = shelf_id
     client = get_db
     shelf = client[:shelves].insert_one(new_shelf)
     client.close
@@ -113,7 +113,7 @@ module Repository
 
   def insert_profile(new_profile)
     profile_id = SecureRandom.uuid.gsub("-", "")
-    new_profile["profile_id"] = profile_id
+    new_profile[:profile_id] = profile_id
     client = get_db
     profile = client[:profiles].insert_one(new_profile)
     client.close

@@ -56,7 +56,7 @@ class Bookclub < Sinatra::Base # to_json should be done at the router level righ
       pw = data["password"]
       email = data["email"]
       begin
-        register_user(username, pw, email)
+        register_user(username, pw, email).to_json
       rescue AuthError => e
         halt e.status_code, e.msg
       end

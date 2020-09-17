@@ -43,8 +43,8 @@ module Auth
     user_id = create_user(userdata)
     generate_profile(user_id)
     response = generate_token(user_id)
-    response["username"] = username
-    response.to_json
+    response[:username] = username
+    response
   end
 
   def get_user(username)
@@ -72,7 +72,7 @@ module Auth
         raise AuthError.new(401, "Incorrect password")
       end
       response = generate_token(user["user_id"])
-      response["username"] = username
+      response[:username] = username
       response.to_json
     end
   end
