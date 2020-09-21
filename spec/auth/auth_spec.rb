@@ -51,4 +51,19 @@ describe Auth do
                           })
     end
   end
+
+  describe "verify_token" do
+    context "Missing/Nonexistent token" do
+      it "fails on incorrect token" do
+        allow_any_instance_of(Repository).to receive(:get_token).and_return(nil)
+        expect { auth_tester.verify_token("some_username", "some_token") }.to raise_error(BookclubErrors::AuthError, "Invalid token/user_id combination")
+      end
+    end
+    context "Found/Existent token" do
+      it "fails on expired token" do
+        allow_any_instance_of(Repository).to receive(:get_token).and_return({ expiry: Time.now - 1 })
+        expect { auth_tester.verify_token("some_username", "some_token") }.to raise_error(BookclubErrors::AuthError, "Token expired")
+      end
+    end
+  end
 end

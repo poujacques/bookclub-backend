@@ -42,6 +42,7 @@ module Auth
     }
     user_id = create_user(userdata)
     generate_profile(user_id)
+
     response = generate_token(user_id)
     response[:username] = username
     response
@@ -56,7 +57,7 @@ module Auth
       username: user["username"],
       user_id: user["user_id"],
     }
-    user_response.to_json
+    user_response
   end
 
   def verify_user(username, pw)
@@ -73,7 +74,7 @@ module Auth
       end
       response = generate_token(user["user_id"])
       response[:username] = username
-      response.to_json
+      response
     end
   end
 
@@ -106,7 +107,7 @@ module Auth
       raise AuthError.new(401, "Invalid token/user_id combination")
     end
 
-    if Time.now >= token["expiry"]
+    if Time.now >= token[:expiry]
       raise AuthError.new(401, "Token expired")
     end
   end

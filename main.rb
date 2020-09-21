@@ -67,7 +67,7 @@ class Bookclub < Sinatra::Base # to_json should be done at the router level righ
       username = data["username"]
       pw = data["password"]
       begin
-        verify_user(username, pw)
+        verify_user(username, pw).to_json
       rescue AuthError => e
         halt e.status_code, e.msg
       end
@@ -86,7 +86,7 @@ class Bookclub < Sinatra::Base # to_json should be done at the router level righ
 
     get "/user/:username" do |username|
       begin
-        get_user(username)
+        get_user(username).to_json
       rescue AuthError => e
         halt e.status_code, e.msg
       end
