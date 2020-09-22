@@ -44,7 +44,7 @@ module Repository
   end
 
   def create_user(userdata)
-    user_id = SecureRandom.uuid.gsub("-", "")
+    user_id = generate_uuid()
     userdata[:user_id] = user_id
     client = get_db
     result = client[:users].insert_one(userdata)
