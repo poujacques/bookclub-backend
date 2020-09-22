@@ -145,7 +145,7 @@ class Bookclub < Sinatra::Base
 
     get "/:user_id/profile" do |user_id| # not protected
       begin
-        get_profile(user_id)
+        get_profile(user_id).to_json
       rescue ProfileError => e
         halt e.status_code, e.msg
       end

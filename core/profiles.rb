@@ -26,13 +26,12 @@ module Profiles
     profile_fields.each do |field|
       profile_response[field] = profile[field]
     end
-    profile_response.to_json
+    profile_response
   end
 
   def update_profile_fields(user_id, profile_updates)
     if !profile_updates.empty?
       update_profile(user_id, profile_updates)
-      { :success => true }
     else
       raise ProfileError.new(400, "Empty or invalid update request")
     end
