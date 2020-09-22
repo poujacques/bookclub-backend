@@ -1,7 +1,6 @@
 # Repositories is for any database-related actions
 
 require "mongo"
-require "securerandom"
 require "date"
 require "./core/resources.rb"
 
@@ -21,7 +20,7 @@ module Repository
     client = get_db
     result = client[:sessions].find({ access_token: token }).delete_one
     client.close
-    result.n
+    result.n != 0
   end
 
   def insert_token(token)
@@ -61,12 +60,12 @@ module Repository
   end
 
   def insert_shelf(new_shelf)
-    shelf_id = SecureRandom.uuid.gsub("-", "")
+    shelf_id = generate_uuid()
     new_shelf[:shelf_id] = shelf_id
     client = get_db
-    shelf = client[:shelves].insert_one(new_shelf)
+    result = client[:shelves].insert_one(new_shelf)
     client.close
-    shelf
+    shelf_id if result.n > 0
   end
 
   def get_exclusive_shelf(user_id)
@@ -112,12 +111,12 @@ module Repository
   end
 
   def insert_profile(new_profile)
-    profile_id = SecureRandom.uuid.gsub("-", "")
+    profile_id = generate_uuid()
     new_profile[:profile_id] = profile_id
     client = get_db
-    profile = client[:profiles].insert_one(new_profile)
+    result = client[:profiles].insert_one(new_profile)
     client.close
-    profile
+    profile_id if result.n > 0
   end
 
   def update_profile(user_id, profile_updates)

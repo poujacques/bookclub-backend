@@ -41,7 +41,7 @@ describe Auth do
         access_token: "some_token",
         expiry: "some_date",
       })
-      expect_any_instance_of(Repository).to receive(:create_user)
+      expect_any_instance_of(Repository).to receive(:create_user).and_return("some_user_id")
       response = auth_tester.register_user("some_username", "some_password", "some_email")
       expect(response).to eq({
                             user_id: "some_id",

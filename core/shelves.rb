@@ -16,7 +16,8 @@ module Shelves #This should be a Class
       type: "exclusive",
       volumes: [],
     }
-    insert_shelf(shelf)
+    shelf_id = insert_shelf(shelf)
+    shelf[:shelf_id] = shelf_id
     shelf
   end
 

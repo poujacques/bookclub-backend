@@ -1,4 +1,5 @@
 # Resources are for anything that should be universally accessible
+require "securerandom"
 
 module Resources
   def get_db_string()
@@ -16,6 +17,8 @@ module Resources
   def get_profile_fields()
     ["bio", "profile_picture", "favourite_book"]
   end
-end
 
-# TODO: Move UUID generator here (securerandom)
+  def generate_uuid()
+    SecureRandom.uuid.gsub("-", "")
+  end
+end

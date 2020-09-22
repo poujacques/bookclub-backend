@@ -10,8 +10,8 @@ require "sinatra"
 require "sinatra/cross_origin"
 require "sinatra/namespace"
 
-class Bookclub < Sinatra::Base # to_json should be done at the router level right?
-  include Auth, Profiles, Shelves, Volumes
+class Bookclub < Sinatra::Base
+  include Auth, Profile, Shelf, Volumes
 
   # CORS
   configure do
@@ -56,7 +56,9 @@ class Bookclub < Sinatra::Base # to_json should be done at the router level righ
       pw = data["password"]
       email = data["email"]
       begin
-        register_user(username, pw, email).to_json
+        response = register_user(username, pw, email)
+        generate_profile(response[:user_id])
+        response.to_json
       rescue AuthError => e
         halt e.status_code, e.msg
       end
@@ -171,7 +173,11 @@ class Bookclub < Sinatra::Base # to_json should be done at the router level righ
           profile_updates[field] = data[field]
         end
       end
-      update_profile_fields(user_id, profile_updates)
+      begin
+        update_profile_fields(user_id, profile_updates)
+      rescue ProfileError => e
+        halt e.status_code, e.msg
+      end
     end
   end
 end

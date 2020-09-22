@@ -2,12 +2,13 @@
 
 require "./core/errors.rb"
 require "./core/repository.rb"
+require "./core/resources.rb"
 
 require "bcrypt"
 require "date"
 
 module Auth
-  include BookclubErrors, Repository
+  include BookclubErrors, Repository, Resources
 
   def verify_input(username, pw)
     if username.nil? || username.empty?
@@ -41,8 +42,9 @@ module Auth
       source: "bookclub",
     }
     user_id = create_user(userdata)
-    generate_profile(user_id)
-
+    if user_id.nil?
+      raise AuthError.new(500, "Failed to create user")
+    end
     response = generate_token(user_id)
     response[:username] = username
     response
@@ -79,8 +81,8 @@ module Auth
   end
 
   def generate_token(user_id)
-    access_token = SecureRandom.uuid.gsub("-", "")
-    refresh_token = SecureRandom.uuid.gsub("-", "")
+    access_token = generate_uuid()
+    refresh_token = generate_uuid()
     expiry = Time.now + 60 * 60 * 24 * 14
     token = {
       user_id: user_id,
@@ -95,8 +97,7 @@ module Auth
       raise AuthError.new(400, "Missing `access_token` in Logout Request")
     end
 
-    modified = delete_token(access_token)
-    if modified == 0
+    unless delete_token(access_token)
       raise AuthError.new(404, "Could not delete token: No such token found in database")
     end
   end
