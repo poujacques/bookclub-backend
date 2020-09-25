@@ -95,9 +95,7 @@ module Auth
   def deactivate_token(access_token)
     if access_token.nil? || access_token.empty?
       raise AuthError.new(400, "Missing `access_token` in Logout Request")
-    end
-
-    unless delete_token(access_token)
+    elsif !delete_token(access_token)
       raise AuthError.new(404, "Could not delete token: No such token found in database")
     end
   end
@@ -106,9 +104,7 @@ module Auth
     token = get_token(user_id, access_token)
     if token.nil?
       raise AuthError.new(401, "Invalid token/user_id combination")
-    end
-
-    if Time.now >= token[:expiry]
+    elsif Time.now >= token[:expiry]
       raise AuthError.new(401, "Token expired")
     end
   end

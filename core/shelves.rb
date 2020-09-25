@@ -7,7 +7,7 @@ require "./core/volumes.rb"
 require "date"
 require "json"
 
-module Shelves #This should be a Class
+module Shelves #This should be a Class, or at least redesigned to account for custom shelves
   include BookclubErrors, Repository, Resources, Volumes
 
   def initialize_shelf(user_id)
@@ -40,16 +40,15 @@ module Shelves #This should be a Class
         shelf_response[x[:shelf] + "_count"] += 1
       end
     end
-
-    shelf_response.to_json
+    shelf_response
   end
 
   def get_volume_from_shelf(volume_id, current_shelf)
     volume = nil
     if !current_shelf[:volumes].nil?
-      current_shelf[:volumes].each do |e|
-        if e[:volume_id] == volume_id
-          volume = e
+      current_shelf[:volumes].each do |current_volume|
+        if current_volume[:volume_id] == volume_id
+          volume = current_volume
         end
       end
     end
@@ -59,9 +58,9 @@ module Shelves #This should be a Class
   def get_currently_reading_from_shelf(current_shelf)
     volume = nil
     if !current_shelf[:volumes].nil?
-      current_shelf[:volumes].each do |e|
-        if e[:shelf] == "currently_reading"
-          volume = e
+      current_shelf[:volumes].each do |current_volume|
+        if current_volume[:shelf] == "currently_reading"
+          volume = current_volume
         end
       end
     end
@@ -140,6 +139,7 @@ module Shelves #This should be a Class
       # but we are purposely losing the time fields of any volumes moved here
     else
       raise ShelfOpError.new(400, "Invalid shelf provided")
+      # This will eventually be replaced by creating a new shelf
     end
     upsert_to_shelf(user_id, new_volume_data, current_volume_data)
   end

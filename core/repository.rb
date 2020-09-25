@@ -49,7 +49,8 @@ module Repository
     client = get_db
     result = client[:users].insert_one(userdata)
     client.close
-    user_id if result.n > 0
+    response = result.n > 0 ? user_id : nil
+    response
   end
 
   def get_user_from_username(username)
@@ -65,7 +66,8 @@ module Repository
     client = get_db
     result = client[:shelves].insert_one(new_shelf)
     client.close
-    shelf_id if result.n > 0
+    response = result.n > 0 ? shelf_id : nil
+    response
   end
 
   def get_exclusive_shelf(user_id)
@@ -116,7 +118,8 @@ module Repository
     client = get_db
     result = client[:profiles].insert_one(new_profile)
     client.close
-    profile_id if result.n > 0
+    response = result.n > 0 ? profile_id : nil
+    response
   end
 
   def update_profile(user_id, profile_updates)

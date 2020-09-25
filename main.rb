@@ -47,7 +47,7 @@ class Bookclub < Sinatra::Base
     end
 
     get "/nyt-top-ten" do
-      get_nyt_top_10()
+      get_nyt_top_10().to_json
     end
 
     post "/register" do
@@ -94,25 +94,25 @@ class Bookclub < Sinatra::Base
       end
     end
 
-    get "/:user_id/protected_endpoint" do |user_id|
-      # Placeholder for protected endpoints
-      access_token = request.env["HTTP_AUTHORIZATION"]
-      if access_token.nil?
-        halt 400, "Missing Authorization header in request to protected endpoint"
-      end
+    # get "/:user_id/protected_endpoint" do |user_id|
+    #   # Placeholder for protected endpoints
+    #   access_token = request.env["HTTP_AUTHORIZATION"]
+    #   if access_token.nil?
+    #     halt 400, "Missing Authorization header in request to protected endpoint"
+    #   end
 
-      access_token = access_token.sub("Bearer ", "")
-      begin
-        verify_token(user_id, access_token)
-      rescue AuthError => e
-        halt e.status_code, e.msg
-      end
-      "Successfully accessed data using correct credentials"
-    end
+    #   access_token = access_token.sub("Bearer ", "")
+    #   begin
+    #     verify_token(user_id, access_token)
+    #   rescue AuthError => e
+    #     halt e.status_code, e.msg
+    #   end
+    #   "Successfully accessed data using correct credentials"
+    # end
 
     get "/:user_id/shelves" do |user_id| # not protected
       begin
-        get_user_shelf(user_id)
+        get_user_shelf(user_id).to_json
       rescue AuthError => e
         halt e.status_code, e.msg
       end
