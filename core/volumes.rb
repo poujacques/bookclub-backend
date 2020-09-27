@@ -25,13 +25,13 @@ module Volumes
     params = { 'api-key': NYT_API_TOKEN }
     nyt_uri.query = URI.encode_www_form(params)
     nyt_response = JSON.parse(Net::HTTP.get(nyt_uri))
-    nyt_volume_data = nyt_response[:results][:books]
+    nyt_volume_data = nyt_response["results"]["books"]
 
     i = 0
     n = 10
     while i < n
-      response_object = { :nyt => nyt_volume_data[i], :rank => nyt_volume_data[i][:rank] }
-      isbn = nyt_volume_data[i][:primary_isbn13]
+      response_object = { :nyt => nyt_volume_data[i], :rank => nyt_volume_data[i]["rank"] }
+      isbn = nyt_volume_data[i]["primary_isbn13"]
       response_object[:google_books] = JSON.parse(get_volumes_result("/volumes", "isbn:" + isbn))
       volume_list.append(response_object)
       i += 1
