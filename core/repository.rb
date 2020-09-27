@@ -20,7 +20,7 @@ module Repository
     client = get_db
     result = client[:sessions].find({ access_token: token }).delete_one
     client.close
-    result.n != 0
+    result.n > 0
   end
 
   def insert_token(token)
