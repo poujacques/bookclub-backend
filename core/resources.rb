@@ -22,8 +22,8 @@ module Resources
       "location", # String
       "birthday", # Date
       "bio", # String
-      "profile_picture", # String, a link to something
-      "favourite_book", # String, preferrably a Volume ID
+      "profile_picture", # String, a link to something (with a default link provided if null)
+      "favourite_book", # String, preferrably a Volume ID but I guess it can just be a title for now
     ]
   end
 
