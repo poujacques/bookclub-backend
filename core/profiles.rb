@@ -32,6 +32,7 @@ module Profiles
   def update_profile_fields(user_id, profile_updates)
     if !profile_updates.empty?
       update_profile(user_id, profile_updates)
+      "Update completed"
     else
       raise ProfileError.new(400, "Empty or invalid update request")
     end
