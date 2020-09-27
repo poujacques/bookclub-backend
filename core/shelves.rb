@@ -31,7 +31,9 @@ module Shelves #This should be a Class, or at least redesigned to account for cu
 
     shelf[:volumes].each do |x|
       volume_api_result = JSON.parse(get_volumes_result("/volumes/" + x[:volume_id]))
-      if !volume_api_result.key?(:error)
+      if !volume_api_result.key?("error")
+        # TODO: There should be a better way to do the above check,
+        # such as adding an exception to shelves if the upserted volume is not found in google books.
         if !shelf_response.key?(x[:shelf])
           shelf_response[x[:shelf]] = []
           shelf_response[x[:shelf] + "_count"] = 0
