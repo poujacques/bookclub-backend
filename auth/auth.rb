@@ -2,12 +2,13 @@
 
 require "./core/errors.rb"
 require "./core/repository.rb"
+require "./core/resources.rb"
 
 require "bcrypt"
 require "date"
 
 module Auth
-  include BookclubErrors, Repository
+  include BookclubErrors, Repository, Resources
 
   def verify_input(username, pw)
     if username.nil? || username.empty?
@@ -41,10 +42,12 @@ module Auth
       source: "bookclub",
     }
     user_id = create_user(userdata)
-    generate_profile(user_id)
+    if user_id.nil?
+      raise AuthError.new(500, "Failed to create user")
+    end
     response = generate_token(user_id)
-    response["username"] = username
-    response.to_json
+    response[:username] = username
+    response
   end
 
   def get_user(username)
@@ -53,10 +56,10 @@ module Auth
       raise AuthError.new(404, "User does not exist")
     end
     user_response = {
-      username: user["username"],
-      user_id: user["user_id"],
+      username: user[:username],
+      user_id: user[:user_id],
     }
-    user_response.to_json
+    user_response
   end
 
   def verify_user(username, pw)
@@ -67,19 +70,19 @@ module Auth
     if user.nil?
       raise AuthError.new(404, "User does not exist")
     else
-      hashed_password = user["hashed_password"]
+      hashed_password = user[:hashed_password]
       if (BCrypt::Password.new(hashed_password) != pw)
         raise AuthError.new(401, "Incorrect password")
       end
-      response = generate_token(user["user_id"])
-      response["username"] = username
-      response.to_json
+      response = generate_token(user[:user_id])
+      response[:username] = username
+      response
     end
   end
 
   def generate_token(user_id)
-    access_token = SecureRandom.uuid.gsub("-", "")
-    refresh_token = SecureRandom.uuid.gsub("-", "")
+    access_token = generate_uuid()
+    refresh_token = generate_uuid()
     expiry = Time.now + 60 * 60 * 24 * 14
     token = {
       user_id: user_id,
@@ -92,10 +95,7 @@ module Auth
   def deactivate_token(access_token)
     if access_token.nil? || access_token.empty?
       raise AuthError.new(400, "Missing `access_token` in Logout Request")
-    end
-
-    modified = delete_token(access_token)
-    if modified == 0
+    elsif !delete_token(access_token)
       raise AuthError.new(404, "Could not delete token: No such token found in database")
     end
   end
@@ -104,9 +104,7 @@ module Auth
     token = get_token(user_id, access_token)
     if token.nil?
       raise AuthError.new(401, "Invalid token/user_id combination")
-    end
-
-    if Time.now >= token["expiry"]
+    elsif Time.now >= token[:expiry]
       raise AuthError.new(401, "Token expired")
     end
   end

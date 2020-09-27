@@ -1,4 +1,5 @@
 # Resources are for anything that should be universally accessible
+require "securerandom"
 
 module Resources
   def get_db_string()
@@ -14,8 +15,19 @@ module Resources
   end
 
   def get_profile_fields()
-    ["bio", "profile_picture", "favourite_book"]
+    # TODO: We should probably try and enforce types here
+    [
+      "first_name", # String
+      "last_name", # String
+      "location", # String
+      "birthday", # Date
+      "bio", # String
+      "profile_picture", # String, a link to something (with a default link provided if null)
+      "favourite_book", # String, preferrably a Volume ID but I guess it can just be a title for now
+    ]
+  end
+
+  def generate_uuid()
+    SecureRandom.uuid.gsub("-", "")
   end
 end
-
-# TODO: Move UUID generator here (securerandom)
