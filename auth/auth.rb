@@ -56,8 +56,8 @@ module Auth
       raise AuthError.new(404, "User does not exist")
     end
     user_response = {
-      username: user["username"],
-      user_id: user["user_id"],
+      username: user[:username],
+      user_id: user[:user_id],
     }
     user_response
   end
@@ -70,11 +70,11 @@ module Auth
     if user.nil?
       raise AuthError.new(404, "User does not exist")
     else
-      hashed_password = user["hashed_password"]
+      hashed_password = user[:hashed_password]
       if (BCrypt::Password.new(hashed_password) != pw)
         raise AuthError.new(401, "Incorrect password")
       end
-      response = generate_token(user["user_id"])
+      response = generate_token(user[:user_id])
       response[:username] = username
       response
     end

@@ -11,7 +11,7 @@ require "sinatra/cross_origin"
 require "sinatra/namespace"
 
 class Bookclub < Sinatra::Base
-  include Auth, Profile, Shelf, Volumes
+  include Auth, Profiles, Shelves, Volumes
 
   # CORS
   configure do

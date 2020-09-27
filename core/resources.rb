@@ -15,7 +15,16 @@ module Resources
   end
 
   def get_profile_fields()
-    ["bio", "profile_picture", "favourite_book"]
+    # We should probably try and enforce types here
+    [
+      "first_name", # String
+      "last_name", # String
+      "location", # String
+      "birthday", # Date
+      "bio", # String
+      "profile_picture", # String, a link to something
+      "favourite_book", # String, preferrably a Volume ID
+    ]
   end
 
   def generate_uuid()
