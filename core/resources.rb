@@ -15,7 +15,7 @@ module Resources
   end
 
   def get_profile_fields()
-    # We should probably try and enforce types here
+    # TODO: We should probably try and enforce types here
     [
       "first_name", # String
       "last_name", # String
