@@ -4,6 +4,7 @@ require "./auth/auth.rb"
 require "./core/profiles.rb"
 require "./core/shelves.rb"
 require "./core/volumes.rb"
+require "./core/reviews.rb"
 
 require "json"
 require "sinatra"
@@ -11,7 +12,7 @@ require "sinatra/cross_origin"
 require "sinatra/namespace"
 
 class Bookclub < Sinatra::Base
-  include Auth, Profiles, Shelves, Volumes
+  include Auth, Profiles, Reviews, Shelves, Volumes
 
   # CORS
   configure do
@@ -44,6 +45,10 @@ class Bookclub < Sinatra::Base
 
     get "/volumes/:volume_id" do |volume_id|
       get_volumes_result("/volumes/" + volume_id)
+    end
+
+    get "/volumes/:volume_id/reviews" do |volume_id|
+      get_volume_reviews(volume_id).to_json
     end
 
     get "/nyt-top-ten" do
@@ -110,6 +115,16 @@ class Bookclub < Sinatra::Base
     #   "Successfully accessed data using correct credentials"
     # end
 
+    get "/:user_id/reviews" do |user_id| # not protected
+      get_user_reviews(user_id).to_json
+    end
+
+    get "/:user_id/reviews/:volume_id" do |user_id, volume_id| # not protected
+      {
+        "review_exists": !get_user_volume_review(volume_id, user_id).nil?,
+      }.to_json
+    end
+
     get "/:user_id/shelves" do |user_id| # not protected
       begin
         get_user_shelf(user_id).to_json
@@ -160,7 +175,7 @@ class Bookclub < Sinatra::Base
       access_token = access_token.sub("Bearer ", "")
       begin
         verify_token(user_id, access_token)
-      rescue ProfileError => e
+      rescue AuthError => e
         halt e.status_code, e.msg
       end
 
@@ -178,6 +193,52 @@ class Bookclub < Sinatra::Base
       rescue ProfileError => e
         halt e.status_code, e.msg
       end
+    end
+
+    post "/:user_id/reviews" do |user_id| # protected
+      access_token = request.env["HTTP_AUTHORIZATION"]
+      if access_token.nil?
+        halt 400, "Missing Authorization header in request to protected endpoint"
+      end
+
+      data = JSON.parse(request.body.read)
+      volume_id = data["volume_id"]
+      rating = data["rating"]
+      review = data["review"]
+
+      access_token = access_token.sub("Bearer ", "")
+      begin
+        verify_token(user_id, access_token)
+      rescue AuthError => e
+        halt e.status_code, e.msg
+      end
+
+      begin
+        add_review(volume_id, user_id, rating, review)
+      rescue ReviewError => e
+        halt e.status_code, e.msg
+      end
+    end
+
+    delete "/:user_id/reviews/:review_id" do |user_id, review_id| # protected
+      access_token = request.env["HTTP_AUTHORIZATION"]
+      if access_token.nil?
+        halt 400, "Missing Authorization header in request to protected endpoint"
+      end
+
+      access_token = access_token.sub("Bearer ", "")
+      begin
+        verify_token(user_id, access_token)
+      rescue AuthError => e
+        halt e.status_code, e.msg
+      end
+
+      begin
+        remove_review(review_id)
+      rescue ReviewError => e
+        halt e.status_code, e.msg
+      end
+      "Successfully deleted review"
     end
   end
 end

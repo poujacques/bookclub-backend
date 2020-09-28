@@ -7,14 +7,14 @@ end
 
 describe Auth do
   let(:auth_tester) { AuthTester.new }
-  describe "verify_input" do
+  describe "verify_auth_input" do
     it "fails on empty username" do
-      expect { auth_tester.verify_input(nil, nil) }.to raise_error(BookclubErrors::AuthError, "Missing `username` in request")
-      expect { auth_tester.verify_input("", nil) }.to raise_error(BookclubErrors::AuthError, "Missing `username` in request")
+      expect { auth_tester.verify_auth_input(nil, nil) }.to raise_error(BookclubErrors::AuthError, "Missing `username` in request")
+      expect { auth_tester.verify_auth_input("", nil) }.to raise_error(BookclubErrors::AuthError, "Missing `username` in request")
     end
     it "fails on empty password" do
-      expect { auth_tester.verify_input("some_username", nil) }.to raise_error(BookclubErrors::AuthError, "Missing `password` in request")
-      expect { auth_tester.verify_input("some_username", "") }.to raise_error(BookclubErrors::AuthError, "Missing `password` in request")
+      expect { auth_tester.verify_auth_input("some_username", nil) }.to raise_error(BookclubErrors::AuthError, "Missing `password` in request")
+      expect { auth_tester.verify_auth_input("some_username", "") }.to raise_error(BookclubErrors::AuthError, "Missing `password` in request")
     end
   end
 

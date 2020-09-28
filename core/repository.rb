@@ -1,4 +1,5 @@
 # Repositories is for any database-related actions
+# TODO: Instead of deleting items, set them to `deleted: true`
 
 require "mongo"
 require "date"
@@ -18,7 +19,7 @@ module Repository
 
   def delete_token(token)
     client = get_db
-    result = client[:sessions].find({ access_token: token }).delete_one
+    result = client[:sessions].find({ "access_token": token }).delete_one
     client.close
     result.n > 0
   end
@@ -35,8 +36,8 @@ module Repository
     result =
       client[:sessions].find(
         {
-          user_id: user_id,
-          access_token: access_token,
+          "user_id": user_id,
+          "access_token": access_token,
         }
       ).first
     client.close
@@ -46,6 +47,7 @@ module Repository
   def create_user(userdata)
     user_id = generate_uuid()
     userdata[:user_id] = user_id
+    userdata[:date_created] = Time.now
     client = get_db
     result = client[:users].insert_one(userdata)
     client.close
@@ -132,5 +134,44 @@ module Repository
     )
     client.close
     profile
+  end
+
+  def insert_review(new_review)
+    review_id = generate_uuid()
+    new_review[:review_id] = review_id
+    new_review[:date_created] = Time.now
+    client = get_db
+    review = client[:reviews].insert_one(new_review)
+    client.close
+    response = review.n > 0 ? review_id : nil
+    response
+  end
+
+  def get_reviews_by_volume_id(volume_id)
+    client = get_db
+    review = client[:reviews].find("volume_id": volume_id)
+    client.close
+    review
+  end
+
+  def get_reviews_by_user_id(user_id)
+    client = get_db
+    review = client[:reviews].find("user_id": user_id)
+    client.close
+    review
+  end
+
+  def get_review_by_volume_and_user(volume_id, user_id)
+    client = get_db
+    review = client[:reviews].find("volume_id": volume_id, "user_id": user_id).first
+    client.close
+    review
+  end
+
+  def delete_review(review_id)
+    client = get_db
+    result = client[:reviews].find({ "review_id": review_id }).delete_one
+    client.close
+    result.n > 0
   end
 end
