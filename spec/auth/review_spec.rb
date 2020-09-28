@@ -13,17 +13,13 @@ describe Reviews do
     end
   end
   describe "verify_review_input" do
-    it "fails on empty username" do
-      expect { review_tester.verify_review_input(nil, "some_user_id", 5) }.to raise_error(BookclubErrors::ReviewError, "Missing `volume_id` in request")
-      expect { review_tester.verify_review_input("", "some_user_id", 5) }.to raise_error(BookclubErrors::ReviewError, "Missing `volume_id` in request")
+    it "fails on empty volume_id" do
+      expect { review_tester.verify_review_input(nil, 5) }.to raise_error(BookclubErrors::ReviewError, "Missing `volume_id` in request")
+      expect { review_tester.verify_review_input("", 5) }.to raise_error(BookclubErrors::ReviewError, "Missing `volume_id` in request")
     end
-    it "fails on empty password" do
-      expect { review_tester.verify_review_input("some_volume_id", nil, 5) }.to raise_error(BookclubErrors::ReviewError, "Missing `user_id` in request")
-      expect { review_tester.verify_review_input("some_volume_id", "", 5) }.to raise_error(BookclubErrors::ReviewError, "Missing `user_id` in request")
-    end
-    it "fails on empty password" do
-      expect { review_tester.verify_review_input("some_volume_id", "some_user_id", nil) }.to raise_error(BookclubErrors::ReviewError, "Missing `rating` in request")
-      expect { review_tester.verify_review_input("some_volume_id", "some_user_id", nil) }.to raise_error(BookclubErrors::ReviewError, "Missing `rating` in request")
+    it "fails on empty rating" do
+      expect { review_tester.verify_review_input("some_volume_id", nil) }.to raise_error(BookclubErrors::ReviewError, "Missing `rating` in request")
+      expect { review_tester.verify_review_input("some_volume_id", nil) }.to raise_error(BookclubErrors::ReviewError, "Missing `rating` in request")
     end
   end
   describe "add_review" do

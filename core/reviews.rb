@@ -21,11 +21,9 @@ module Reviews
     end
   end
 
-  def verify_review_input(volume_id, user_id, rating)
+  def verify_review_input(volume_id, rating)
     if volume_id.nil? || volume_id.empty?
       raise ReviewError.new(400, "Missing `volume_id` in request")
-    elsif user_id.nil? || user_id.empty?
-      raise ReviewError.new(400, "Missing `user_id` in request")
     elsif rating.nil?
       raise ReviewError.new(400, "Missing `rating` in request")
     end
@@ -36,7 +34,7 @@ module Reviews
   end
 
   def add_review(volume_id, user_id, rating, review = nil)
-    verify_review_input(volume_id, user_id, rating)
+    verify_review_input(volume_id, rating)
 
     if !get_user_volume_review(volume_id, user_id).nil?
       raise ReviewError.new(409, "Review for volume already exists for current user")
