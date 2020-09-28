@@ -30,4 +30,9 @@ module Resources
   def generate_uuid()
     SecureRandom.uuid.gsub("-", "")
   end
+
+  def get_max_min_ratings()
+    # Min, Max
+    0, 5
+  end
 end

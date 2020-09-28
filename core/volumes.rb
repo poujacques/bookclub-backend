@@ -9,9 +9,6 @@ module Volumes
   NYT_URI = "https://api.nytimes.com/svc/books/v3/lists/current/combined-print-and-e-book-fiction.json"
   NYT_API_TOKEN = get_nyt_api_token()
 
-  def get_volume_reviews()
-  end
-
   def get_volumes_result(uri_path, query = nil)
     uri = URI(BASE_URI + uri_path)
     if query

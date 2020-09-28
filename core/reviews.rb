@@ -2,14 +2,16 @@ require "./core/repository.rb"
 require "./core/errors.rb"
 
 module Reviews
-  include ReviewErrors, Repository
+  include BookclubErrors, Repository, Resources
+
+  MIN_RATING, MAX_RATING = get_max_min_ratings()
 
   def get_volume_reviews(volume_id)
-    get_reviews_by_volume_id(volume_id)
+    get_reviews_by_volume_id(volume_id).map { |review| review }
   end
 
   def get_user_reviews(user_id)
-    get_reviews_by_user_id(user_id)
+    get_reviews_by_user_id(user_id).map { |review| review }
   end
 
   def remove_review(review_id)
@@ -32,6 +34,8 @@ module Reviews
     verify_input(volume_id, user_id, rating)
     begin
       rating_int = Integer(rating)
+      rating_int = [MIN_RATING, rating_int].max
+      rating_int = [MAX_RATING, rating_int].min
     rescue ArgumentError => e
       raise ReviewError.new(400, "Invalid rating provided in request")
     end
