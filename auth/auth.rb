@@ -10,7 +10,7 @@ require "date"
 module Auth
   include BookclubErrors, Repository, Resources
 
-  def verify_input(username, pw)
+  def verify_auth_input(username, pw)
     if username.nil? || username.empty?
       raise AuthError.new(400, "Missing `username` in request")
     elsif pw.nil? || pw.empty?
@@ -19,7 +19,7 @@ module Auth
   end
 
   def verify_registration_input(username, pw, email)
-    verify_input(username, pw)
+    verify_auth_input(username, pw)
     if email.nil? || email.empty?
       raise AuthError.new(400, "Missing `email` in request")
     end
@@ -63,7 +63,7 @@ module Auth
   end
 
   def verify_user(username, pw)
-    error = verify_input(username, pw)
+    error = verify_auth_input(username, pw)
     return error if error
 
     user = get_user_from_username(username)

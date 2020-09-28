@@ -141,24 +141,31 @@ module Repository
     new_review[:review_id] = review_id
     new_review[:date_created] = Time.now
     client = get_db
-    result = client[:reviews].insert_one(review_id)
+    review = client[:reviews].insert_one(new_review)
     client.close
-    response = result.n > 0 ? review_id : nil
+    response = review.n > 0 ? review_id : nil
     response
   end
 
   def get_reviews_by_volume_id(volume_id)
     client = get_db
-    profile = client[:reviews].find("volume_id": volume_id)
+    review = client[:reviews].find("volume_id": volume_id)
     client.close
-    profile
+    review
   end
 
   def get_reviews_by_user_id(user_id)
     client = get_db
-    profile = client[:reviews].find("user_id": user_id)
+    review = client[:reviews].find("user_id": user_id)
     client.close
-    profile
+    review
+  end
+
+  def get_review_by_volume_and_user(volume_id, user_id)
+    client = get_db
+    review = client[:reviews].find("volume_id": volume_id, "user_id": user_id).first
+    client.close
+    review
   end
 
   def delete_review(review_id)

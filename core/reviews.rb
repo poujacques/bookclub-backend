@@ -2,7 +2,8 @@ require "./core/repository.rb"
 require "./core/errors.rb"
 
 module Reviews
-  include BookclubErrors, Repository, Resources
+  extend Resources
+  include BookclubErrors, Repository
 
   MIN_RATING, MAX_RATING = get_max_min_ratings()
 
@@ -20,18 +21,27 @@ module Reviews
     end
   end
 
-  def verify_input(volume_id, user_id, rating)
+  def verify_review_input(volume_id, user_id, rating)
     if volume_id.nil? || volume_id.empty?
       raise ReviewError.new(400, "Missing `volume_id` in request")
     elsif user_id.nil? || user_id.empty?
       raise ReviewError.new(400, "Missing `user_id` in request")
-    elsif rating.nil? || rating.empty?
+    elsif rating.nil?
       raise ReviewError.new(400, "Missing `rating` in request")
     end
   end
 
+  def get_user_volume_review(volume_id, user_id)
+    get_review_by_volume_and_user(volume_id, user_id)
+  end
+
   def add_review(volume_id, user_id, rating, review = nil)
-    verify_input(volume_id, user_id, rating)
+    verify_review_input(volume_id, user_id, rating)
+
+    if !get_user_volume_review(volume_id, user_id).nil?
+      raise ReviewError.new(409, "Review for volume already exists for current user")
+    end
+
     begin
       rating_int = Integer(rating)
       rating_int = [MIN_RATING, rating_int].max
@@ -46,7 +56,7 @@ module Reviews
       :review => review,
     }
     review_id = insert_review(new_review)
-    if result.nil?
+    if review_id.nil?
       raise ReviewError.new(500, "Unable to save result to db")
     end
     review_id
