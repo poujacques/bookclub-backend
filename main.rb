@@ -121,7 +121,7 @@ class Bookclub < Sinatra::Base
 
     get "/:user_id/reviews/:volume_id" do |user_id, volume_id| # not protected
       {
-        "review_exists": get_user_volume_review(volume_id, user_id) == true,
+        "review_exists": !get_user_volume_review(volume_id, user_id).nil?,
       }.to_json
     end
 

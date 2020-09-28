@@ -33,6 +33,6 @@ module Resources
 
   def get_max_min_ratings()
     # Min, Max
-    return 0, 5
+    return 1, 5
   end
 end

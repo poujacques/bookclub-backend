@@ -16,7 +16,7 @@ module Reviews
   end
 
   def remove_review(review_id)
-    if delete_review(review_id)
+    if !delete_review(review_id)
       raise ReviewError.new(404, "Could not delete review: No such review found in database")
     end
   end
