@@ -24,7 +24,7 @@ module Shelves #This should be a Class, or at least redesigned to account for cu
   def get_user_shelf(user_id, query = nil)
     shelf = get_exclusive_shelf(user_id)
     if shelf.nil?
-      raise AuthError.new(404, "User does not exist or no shelf data exists")
+      raise ShelfOpError.new(404, "User does not exist or no shelf data exists")
     end
 
     shelf_response = {}

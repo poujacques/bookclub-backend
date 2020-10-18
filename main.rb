@@ -128,7 +128,7 @@ class Bookclub < Sinatra::Base
     get "/:user_id/shelves" do |user_id| # not protected
       begin
         get_user_shelf(user_id).to_json
-      rescue AuthError => e
+      rescue ShelfOpError => e
         halt e.status_code, e.msg
       end
     end
