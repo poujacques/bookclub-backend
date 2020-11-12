@@ -44,7 +44,7 @@ module Reviews
       rating_int = Integer(rating)
       rating_int = [MIN_RATING, rating_int].max
       rating_int = [MAX_RATING, rating_int].min
-    rescue ArgumentError => e
+    rescue ArgumentError, TypeError => e
       raise ReviewError.new(400, "Invalid rating provided in request")
     end
     new_review = {
