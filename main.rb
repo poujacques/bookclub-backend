@@ -148,11 +148,15 @@ class Bookclub < Sinatra::Base
 
       data = JSON.parse(request.body.read)
       operation = data["op"]
-      volume_id = data["volume_id"]
+      volume_data = {
+        volume_id: data["volume_id"],
+        title: data["title"],
+        description: data["description"],
+      }
       to_shelf = data["to_shelf"]
       set_completed = data["set_completed"]
       begin
-        modify_exclusive_shelves(user_id, operation, volume_id, to_shelf, set_completed)
+        modify_exclusive_shelves(user_id, operation, volume_data, to_shelf, set_completed)
       rescue ShelfOpError => e
         halt e.status_code, e.msg
       end

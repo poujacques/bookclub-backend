@@ -52,12 +52,12 @@ describe Shelves do
     it "Handles an invalid operation" do
       expect_any_instance_of(Repository).to receive(:get_exclusive_shelf).and_return(empty_shelf)
       expect(shelf_tester).not_to receive(:initialize_shelf)
-      expect { shelf_tester.modify_exclusive_shelves("some_user_id", "invalid_operation", "some_volume_id", "some_shelf") }.to raise_error(BookclubErrors::ShelfOpError, "Invalid operation provided")
+      expect { shelf_tester.modify_exclusive_shelves("some_user_id", "invalid_operation", { volume_id: "some_volume_id" }, "some_shelf") }.to raise_error(BookclubErrors::ShelfOpError, "Invalid operation provided")
     end
     it "Initializes shelf if shelf does not exist" do
       expect_any_instance_of(Repository).to receive(:get_exclusive_shelf).and_return(nil)
       expect(shelf_tester).to receive(:initialize_shelf).with("some_user_id").and_return(empty_shelf)
-      expect { shelf_tester.modify_exclusive_shelves("some_user_id", "invalid_operation", "some_volume_id", "some_shelf") }.to raise_error(BookclubErrors::ShelfOpError, "Invalid operation provided")
+      expect { shelf_tester.modify_exclusive_shelves("some_user_id", "invalid_operation", { volume_id: "some_volume_id" }, "some_shelf") }.to raise_error(BookclubErrors::ShelfOpError, "Invalid operation provided")
     end
   end
   describe "handle_upsert_to_shelf" do
@@ -67,18 +67,11 @@ describe Shelves do
     let(:current_shelf) { { :volumes => [volume] } }
     it "Stops early if trying to move a volume to its current shelf" do
       expect(shelf_tester).to receive(:get_volume_from_shelf).and_return(volume)
-      expect { shelf_tester.handle_upsert_to_shelf("some_user_id", "some_volume_id", "some_shelf", true, current_shelf) }.to raise_error(BookclubErrors::ShelfOpError, "No modifications needed")
+      expect { shelf_tester.handle_upsert_to_shelf("some_user_id", { volume_id: "some_volume_id" }, "some_shelf", true, current_shelf) }.to raise_error(BookclubErrors::ShelfOpError, "No modifications needed")
     end
     it "Stops early if invalid shelf provided" do
       expect(shelf_tester).to receive(:get_volume_from_shelf).and_return(volume)
-      expect { shelf_tester.handle_upsert_to_shelf("some_user_id", "some_volume_id", "some_invalid_shelf", true, current_shelf) }.to raise_error(BookclubErrors::ShelfOpError, "Invalid shelf provided")
-    end
-    it "currently_reading - bumps out whatever being currently read" do
-      expect(shelf_tester).to receive(:get_volume_from_shelf).and_return(volume)
-      expect(shelf_tester).to receive(:get_currently_reading_from_shelf).and_return({ :volume_id => "some_other_volume_id", :shelf => "currently_reading" })
-      expect(shelf_tester).to receive(:bump_currently_reading)
-      expect_any_instance_of(Repository).to receive(:upsert_to_shelf).and_return(nil)
-      expect(shelf_tester.handle_upsert_to_shelf("some_user_id", "some_volume_id", "currently_reading", true, current_shelf)).to be_nil
+      expect { shelf_tester.handle_upsert_to_shelf("some_user_id", { volume_id: "some_volume_id" }, "some_invalid_shelf", true, current_shelf) }.to raise_error(BookclubErrors::ShelfOpError, "Invalid shelf provided")
     end
   end
 end

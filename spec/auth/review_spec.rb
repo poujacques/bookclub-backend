@@ -30,7 +30,9 @@ describe Reviews do
     it "fails when review is an non-integer value" do
       expect(review_tester).to receive(:get_user_volume_review).and_return(nil)
       expect { review_tester.add_review("some_volume_id", "some_user_id", "cat") }.to raise_error(BookclubErrors::ReviewError, "Invalid rating provided in request")
+      expect(review_tester).to receive(:get_user_volume_review).and_return(nil)
       expect { review_tester.add_review("some_volume_id", "some_user_id", []) }.to raise_error(BookclubErrors::ReviewError, "Invalid rating provided in request")
+      expect(review_tester).to receive(:get_user_volume_review).and_return(nil)
       expect { review_tester.add_review("some_volume_id", "some_user_id", {}) }.to raise_error(BookclubErrors::ReviewError, "Invalid rating provided in request")
     end
   end
