@@ -149,9 +149,14 @@ class Bookclub < Sinatra::Base
       data = JSON.parse(request.body.read)
       operation = data["op"]
       volume_data = {
-        volume_id: data["volume_id"],
+        volume_id: data["id"],
         title: data["title"],
-        description: data["description"],
+        subtitle: data["subtitle"],
+        authors: data["authors"],
+        description: data["desc"],
+        ratings: data["ratings"],
+        img: data["img"],
+        detail: data["detail"],
       }
       to_shelf = data["to_shelf"]
       set_completed = data["set_completed"]
