@@ -151,7 +151,9 @@ class Bookclub < Sinatra::Base
       volume_data = {
         volume_id: data.dig("volume_data", "id"),
         title: data.dig("volume_data", "title"),
+        subtitle: data.dig("volume_data", "subtitle"),
         authors: data.dig("volume_data", "authors"),
+        desc: data.dig("volume_data", "desc"),
         ratings: data.dig("volume_data", "ratings"),
         img: data.dig("volume_data", "img"),
         detail: data.dig("volume_data", "detail"),
