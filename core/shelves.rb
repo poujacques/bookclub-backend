@@ -37,8 +37,8 @@ module Shelves #This should be a Class, or at least redesigned to account for cu
           count: 0,
         }
       end
-      shelf_response[volume[:shelf][:books]].append(volume)
-      shelf_response[volume[:shelf][:count]] += 1
+      shelf_response[volume[:shelf]][:books].append(volume)
+      shelf_response[volume[:shelf]][:count] += 1
     end
     shelf_response
   end
